@@ -24,17 +24,23 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NumericUpDownLib, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dirkster.NumericUpDownLib.1.0.2\lib\net4\NumericUpDownLib.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="Sanford.Multimedia.Midi, Version=6.6.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sanford.Multimedia.Midi.6.6.0\lib\net20\Sanford.Multimedia.Midi.dll</HintPath>
     </Reference>
@@ -58,10 +64,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\ArrayExtemtions.cs" />
+    <Compile Include="Controls\MidiOut.cs" />
     <Compile Include="Controls\PianoRollGrid.cs" />
+    <Compile Include="Controls\Player.cs" />
+    <Compile Include="Controls\TrackExtensions.cs" />
     <Compile Include="IntPoint.cs" />
-    <Compile Include="UserControl1.xaml.cs">
-      <DependentUpon>UserControl1.xaml</DependentUpon>
+    <Compile Include="Resources\Pens.cs" />
+    <Compile Include="Controls\PianoRollControl.xaml.cs">
+      <DependentUpon>PianoRollControl.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -71,12 +82,11 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Controls\GridCanvas.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="UserControl1.xaml">
+    <Page Include="Controls\PianoRollControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -85,28 +95,55 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <Resource Include="Resources\Images\Save_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\SaveAs_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\NewFile_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Undo_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Redo_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Copy_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Cut_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Paste_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Pause_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Run_blue_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Stop_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Settings_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\StatusHelp_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\OpenFolder_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\ZoomOut_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\ZoomIn_16x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

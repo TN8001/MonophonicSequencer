@@ -1,163 +1,153 @@
-﻿using Sanford.Multimedia.Midi;
+﻿using MonophonicSequencer.Resources;
+using Sanford.Multimedia.Midi;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using System.Linq;
 
 namespace MonophonicSequencer.Controls
 {
+    // 現時点の仕様
+    // 4/4拍子 固定
+    // 16分音符 固定
+    // 鍵盤数36 固定（3オクターブ C3:48～B5:83）
+    // 単音 音色0 エフェクト無し
+    // Output0 固定
     public class PianoRollGrid : Grid
     {
         private const int KeyCount = 36;
         private static readonly HashSet<int> blackKeys = new HashSet<int> { 1, 3, 5, 8, 10 };
-        private static readonly OutputDevice outDevice;// = new OutputDevice(0);
-        private static readonly Pen bluePen = new Pen(Brushes.Gray, 1);
-        private static readonly Pen grayPen = new Pen(Brushes.Gray, 1);
-        private static readonly Pen lightGrayPen = new Pen(Brushes.LightGray, 1);
-        private static readonly Pen blackPen = new Pen(Brushes.Black, 1);
-        private static readonly Pen transparentPen = new Pen(Brushes.Transparent, 0);
 
         #region DependencyProperty MeasureCount 小節数
         public int MeasureCount { get => (int)GetValue(MeasureCountProperty); set => SetValue(MeasureCountProperty, value); }
         public static readonly DependencyProperty MeasureCountProperty
             = DependencyProperty.Register(nameof(MeasureCount), typeof(int), typeof(PianoRollGrid),
-                new PropertyMetadata(4, OnMeasureCountChanged));
+                new PropertyMetadata(16, OnMeasureCountChanged));
         private static void OnMeasureCountChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if(d is PianoRollGrid g) g.OnMeasureCountChanged();
         }
         private void OnMeasureCountChanged()
         {
-            var c = MeasureCount * 16; // 16分音符のみ
+            var c = MeasureCount * 16;
             if(ColumnDefinitions.Count == c) return;
 
-            if(ColumnDefinitions.Count > c)
+            if(ColumnDefinitions.Count > c) // 譜面縮小
             {
+                // はみ出した要素を削除
+                for(var i = c; i < noteArray.GetLength(0); i++)
+                {
+                    if(measureText[i] != null)
+                        Children.Remove(measureText[i]);
+                    for(var j = 0; j < noteArray.GetLength(1); j++)
+                        Children.Remove(noteArray[i, j]);
+                }
+
                 while(ColumnDefinitions.Count != c)
                     ColumnDefinitions.RemoveAt(ColumnDefinitions.Count);
+                IsDirty = true;
             }
-            else
+            else // 譜面拡大
             {
                 while(ColumnDefinitions.Count != c)
                     ColumnDefinitions.Add(new ColumnDefinition());
             }
+            noteArray = ResizeArray(noteArray, c, RowDefinitions.Count);
+            Array.Resize(ref measureText, c);
+            AddMeasureText();
 
-            noteArray = ResizeArray(noteArray, ColumnDefinitions.Count, RowDefinitions.Count);
+            SetColumnSpan(line, MeasureCount * 16);
+        }
+
+        private void AddMeasureText()
+        {
+            for(var i = 0; i < measureText.GetLength(0); i += 16)
+            {
+                if(measureText[i] != null) continue;
+
+                var b = new TextBlock { Text = $"{i / 16 + 1}", FontSize = 20 };
+                SetColumn(b, i);
+                SetColumnSpan(b, 4);
+                SetRow(b, 0);
+
+                Children.Add(b);
+                measureText[i] = b;
+            }
         }
         #endregion
+        public double Offset
+        {
+            get => line.Margin.Left;
+            set => line.Margin = new Thickness(value, 0, 0, 0);
+        }
+        public int Offset2
+        {
+            set
+            {
+                value -= 2;
+                if(value < 0) value = 0;
+                var col = ColumnDefinitions[value / 6];
+                var delta = (value % 6) * (col.ActualWidth / 6);
+                Offset = col.Offset + delta;
+                Debug.WriteLine($"c:{value / 6} n:{col.Offset} Offset:{Offset} value:{value}");
+            }
+        }
 
-        private byte Note => (byte)(83 - position.Y);
+        public bool IsDirty { get; private set; }
+        public MidiOut MidiOut { get; set; }
+
+        private byte note => (byte)(83 - position.Y);
         private Border[,] noteArray = new Border[0, 0];
+        private TextBlock[] measureText = new TextBlock[0];
         private IntPoint position;
-
-        Sequence sequence = new Sequence();
-        Sequencer sequencer = new Sequencer();
-
+        private Border line;
+        private Border measurer;
 
         static PianoRollGrid()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(PianoRollGrid), new FrameworkPropertyMetadata(typeof(PianoRollGrid)));
-            if(!DesignerProperties.GetIsInDesignMode(new UIElement()))
-                outDevice = new OutputDevice(0);
         }
         public PianoRollGrid()
         {
-            while(RowDefinitions.Count != KeyCount)
+            RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            while(RowDefinitions.Count != KeyCount + 1)
                 RowDefinitions.Add(new RowDefinition());
+
+            AddLine();
+            measurer = new Border { Visibility = Visibility.Hidden, };
+            Children.Add(measurer);
+
             OnMeasureCountChanged();
-
-            Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
-
-            //sequence.LoadProgressChanged += HandleLoadProgressChanged;
-            //sequence.LoadCompleted += HandleLoadCompleted;
-
-            //sequence.Format = 1;
-            //// 
-            //// sequencer1
-            //// 
-            //sequencer.Position = 0;
-            //sequencer.Sequence = sequence;
-            //sequencer.PlayingCompleted += Sequencer_PlayingCompleted;
-            //sequencer.ChannelMessagePlayed += Sequencer_ChannelMessagePlayed;
-            ////sequencer.SysExMessagePlayed += Sequencer_SysExMessagePlayed;
-            //sequencer.Chased += Sequencer_Chased;
-            //sequencer.Stopped += Sequencer_Stopped;
-
-            //sequence.LoadAsync("noname.mid");
-            //sequencer.Sequence = sequence;
-            //sequencer.Start();
-
-
-            //Sequencer player = new Sequencer();
-            //Sequence sequence = new Sequence("noname.mid");
-            //Track track = sequence[0];
-
-            //foreach(MidiEvent midiEvent in track.Iterator())
-            //{
-            //    IMidiMessage mess = midiEvent.MidiMessage;
-            //    if(mess.MessageType == MessageType.Channel)
-            //    {
-            //        ChannelMessage chanMess = (ChannelMessage)mess;
-            //        if(chanMess.Command == ChannelCommand.NoteOn)
-            //        {
-            //            Console.WriteLine(chanMess.Data1);
-            //        }
-            //    }
-            //}
-            //m();
         }
-
-        private void Sequencer_Stopped(object sender, StoppedEventArgs e)
+        public IEnumerable<(int index, int note)> GetTrack()
         {
-            Debug.WriteLine("Sequencer_Stopped");
+            IsDirty = false;
+            return noteArray.Select((n, x, y) => (n, x, y))
+                            .Where(x => x.n != null)
+                            .Select(x => (x.x, 83 - x.y));
         }
 
-        private void Sequencer_Chased(object sender, ChasedEventArgs e)
+        private void AddLine()
         {
-            Debug.WriteLine("Sequencer_Chased");
+            line = new Border
+            {
+                Background = Brushes.Red,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Width = 2,
+            };
+
+            SetColumn(line, 0);
+            SetRow(line, 0);
+            SetRowSpan(line, 37);
+            SetZIndex(line, 100);
+            Children.Add(line);
         }
 
-        private void Sequencer_SysExMessagePlayed(object sender, SysExMessageEventArgs e)
-        {
-            Debug.WriteLine("Sequencer_SysExMessagePlayed");
-        }
-
-        private void Sequencer_ChannelMessagePlayed(object sender, ChannelMessageEventArgs e)
-        {
-            Debug.WriteLine("Sequencer_ChannelMessagePlayed");
-            outDevice.Send(e.Message);
-        }
-
-        private void Sequencer_PlayingCompleted(object sender, EventArgs e)
-        {
-            Debug.WriteLine("Sequencer_PlayingCompleted");
-        }
-
-        private void HandleLoadCompleted(object sender, AsyncCompletedEventArgs e)
-        {
-            sequencer.Start();
-
-            Debug.WriteLine("HandleLoadCompleted");
-        }
-
-        private void HandleLoadProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            Debug.WriteLine("HandleLoadProgressChanged");
-        }
-
-
-
-        private void Dispatcher_ShutdownStarted(object sender, EventArgs e)
-        {
-            if(!outDevice.IsDisposed)
-                outDevice.Dispose();
-        }
-
+        #region OnRender
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
@@ -165,60 +155,93 @@ namespace MonophonicSequencer.Controls
         }
         private void RenderGrid(DrawingContext dc)
         {
+            RenderBlackKeys(dc);
+            RenderLightGrayLine(dc);
+            RenderGrayLine(dc);
+            RenderBlackLine(dc);
+
+            var rect = new Rect(0, 0, ActualWidth, ActualHeight);
+            dc.DrawRectangle(Brushes.Transparent, Pens.Black, rect); // 全体囲む四角 黒
+        }
+        private void RenderBlackKeys(DrawingContext dc) // 黒鍵 極薄グレー
+        {
             var index = 0;
             foreach(var row in RowDefinitions)
             {
-                if(blackKeys.Contains(index % 12))
-                {
-                    dc.DrawRectangle(Brushes.WhiteSmoke, transparentPen,
-                        new Rect(0, row.Offset, ActualWidth, row.ActualHeight));
-                }
+                if(!blackKeys.Contains((index++ % 12) - 1)) continue;
 
-                var p1 = new Point(0, row.Offset);
-                var p2 = new Point(ActualWidth, row.Offset);
-                if(index % 12 == 0)
-                    dc.DrawLine(blackPen, p1, p2);
-                else
-                    dc.DrawLine(lightGrayPen, p1, p2);
+                var rect = new Rect(0, row.Offset, ActualWidth, row.ActualHeight);
+                dc.DrawRectangle(Brushes.WhiteSmoke, Pens.Transparent, rect);
+            }
+        }
+        private void RenderLightGrayLine(DrawingContext dc) // 基本区切り線 薄グレー
+        {
+            foreach(var row in RowDefinitions)
+                DrawLine(dc, Pens.LightGray, 0, row.Offset, ActualWidth, row.Offset);
 
-                index++;
+            foreach(var column in ColumnDefinitions)
+                DrawLine(dc, Pens.LightGray, column.Offset, 0, column.Offset, ActualHeight);
+        }
+        private void RenderGrayLine(DrawingContext dc) // 4分音符区切り線 グレー
+        {
+            var index = 0;
+            foreach(var column in ColumnDefinitions)
+            {
+                if(index++ % 4 != 0) continue;
+
+                DrawLine(dc, Pens.Gray, column.Offset, 0, column.Offset, ActualHeight);
+            }
+        }
+        private void RenderBlackLine(DrawingContext dc) // 小節・オクターブ区切り線 黒
+        {
+            var index = 0;
+            foreach(var column in ColumnDefinitions)
+            {
+                if(index++ % 16 != 0) continue;
+
+                DrawLine(dc, Pens.Black, column.Offset, 0, column.Offset, ActualHeight);
             }
 
             index = 0;
-            foreach(var column in ColumnDefinitions)
+            foreach(var row in RowDefinitions)
             {
-                var p1 = new Point(column.Offset, 0);
-                var p2 = new Point(column.Offset, ActualHeight);
+                if(index++ % 12 != 1) continue;
 
-                if(index % 16 == 0)
-                    dc.DrawLine(blackPen, p1, p2);
-                else if(index % 4 == 0)
-                    dc.DrawLine(grayPen, p1, p2);
-                else
-                    dc.DrawLine(lightGrayPen, p1, p2);
-
-                index++;
+                DrawLine(dc, Pens.Black, 0, row.Offset, ActualWidth, row.Offset);
             }
+        }
+        private void DrawLine(DrawingContext dc, Pen pen, double x1, double x2, double y1, double y2)
+            => dc.DrawLine(pen, new Point(x1, x2), new Point(y1, y2));
+        #endregion
 
-            dc.DrawRectangle(Brushes.Transparent, blackPen,
-                new Rect(0, 0, ActualWidth, ActualHeight));
+        private double GetmeasurerX(int col)
+        {
+            SetColumn(measurer, col);
+            UpdateLayout();
+            var p = measurer.PointToScreen(new Point(0, 0));
+            return PointFromScreen(p).X - 1;
         }
 
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseLeftButtonDown(e);
+            e.Handled = true;
 
-            Play(GetCellNumber());
+            var p = GetCellNumber();
+            if(p.Y == -1) // 小節ヘッダー
+                Offset = GetmeasurerX(p.X);
+            else
+                PlayNote(p);
         }
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
-            if(e.LeftButton != MouseButtonState.Pressed) return;
 
+            if(e.LeftButton != MouseButtonState.Pressed) return;
             var p = GetCellNumber();
             if(p == position) return;
 
-            Play(p);
+            PlayNote(p);
         }
         protected override void OnPreviewMouseRightButtonDown(MouseButtonEventArgs e)
         {
@@ -229,7 +252,7 @@ namespace MonophonicSequencer.Controls
 
         private IntPoint GetCellNumber()
         {
-            var p = new IntPoint();
+            var p = new IntPoint(0, -1);
             var height = 0.0;
             var width = 0.0;
             var point = Mouse.GetPosition(this);
@@ -238,37 +261,43 @@ namespace MonophonicSequencer.Controls
             {
                 width += columnDefinition.ActualWidth;
                 if(width >= point.X) break;
+
                 p.X++;
             }
             foreach(var rowDefinition in RowDefinitions)
             {
                 height += rowDefinition.ActualHeight;
                 if(height >= point.Y) break;
+
                 p.Y++;
             }
-
+            Debug.WriteLine(p);
             return p;
         }
-        private void Play(IntPoint p)
+        private void PlayNote(IntPoint p)
         {
-            for(var i = 0; i < noteArray.GetLength(1); i++)
+            if(p.Y == -1) return; // 小節ヘッダー
+
+            for(var i = 0; i < noteArray.GetLength(1); i++) // 単音のため同カラムのnoteを削除
                 RemoveNote(p.X, i);
 
             AddNote(p);
 
-            NoteOn();
-            position = p;
             NoteOff();
+            position = p;
+            NoteOn();
+            Debug.WriteLine(note);
         }
         private void AddNote(IntPoint point) => AddNote(point.X, point.Y);
         private void AddNote(int column, int row)
         {
-            var b = new Border { Background = Brushes.Blue };
-            SetColumn(b, column);
-            SetRow(b, row);
+            var border = new Border { Background = Brushes.Blue };
+            SetColumn(border, column);
+            SetRow(border, row + 1);
 
-            Children.Add(b);
-            noteArray[column, row] = b;
+            Children.Add(border);
+            noteArray[column, row] = border;
+            IsDirty = true;
         }
         private void RemoveNote(IntPoint point) => RemoveNote(point.X, point.Y);
         private void RemoveNote(int column, int row)
@@ -278,75 +307,12 @@ namespace MonophonicSequencer.Controls
 
             Children.Remove(note);
             noteArray[column, row] = null;
+            IsDirty = true;
         }
-        private void NoteOn() => outDevice.Send(new ChannelMessage(ChannelCommand.NoteOn, 0, Note, 127));
-        private void NoteOff() => outDevice.Send(new ChannelMessage(ChannelCommand.NoteOff, 0, Note, 0));
-
-        //private void Init()
-        //{
-        //    RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        //    var b = new Border();
-        //    b.Background = new ImageBrush(new BitmapImage(new Uri("pack://application:,,,/MonophonicSequencer;component/IMG_1771.PNG")));
-        //    //b.Background = new ImageBrush(new BitmapImage(new Uri("pack://application:,,,/IMG_1771.PNG")));
-        //    SetRow(b, 10);
-        //    SetColumn(b, 0);
-        //    SetRowSpan(b, 12);
-        //    b.Width = 30;
-        //    Children.Add(b);
-
-        //}
+        private void NoteOn() => MidiOut?.Device?.Send(new ChannelMessage(ChannelCommand.NoteOn, 0, note, 127));
+        private void NoteOff() => MidiOut?.Device?.Send(new ChannelMessage(ChannelCommand.NoteOff, 0, note, 0));
 
 
-
-        private void m()
-        {
-            Sequence sequence = new Sequence();
-            Sequencer sequencer = new Sequencer();
-            // Track  
-            Track track = new Track();
-
-            // Tempo
-            TempoChangeBuilder tempoBuilder = new TempoChangeBuilder();
-            tempoBuilder.Tempo = 100;
-            tempoBuilder.Build();
-            track.Insert(0, tempoBuilder.Result);
-
-            ChannelMessageBuilder channelBuilder = new ChannelMessageBuilder();
-
-            //// Choix Intrument
-            //channelBuilder.MidiChannel = 0;
-            //channelBuilder.Command = ChannelCommand.ProgramChange;
-            //channelBuilder.Data1 = 0;
-            //channelBuilder.Data2 = 0;
-            //channelBuilder.Build();
-            //track.Insert(0, channelBuilder.Result);
-
-            // Jouer note
-            channelBuilder.MidiChannel = 0;
-            channelBuilder.Command = ChannelCommand.NoteOn;
-            channelBuilder.Data1 = 60;
-            channelBuilder.Data2 = 127;
-            channelBuilder.Build();
-            track.Insert(0, channelBuilder.Result);
-
-            // Arrêter note
-            channelBuilder.MidiChannel = 0;
-            channelBuilder.Command = ChannelCommand.NoteOff;
-            channelBuilder.Data1 = 60;
-            channelBuilder.Data2 = 0;
-            channelBuilder.Build();
-            track.Insert(479, channelBuilder.Result);
-
-            track.EndOfTrackOffset = 480;
-
-            sequence.Add(track);
-            sequence.Format = 0;
-
-            sequencer.Position = 0;
-            sequencer.Sequence = sequence;
-            sequence.Save("test.mid");
-            sequencer.Start();
-        }
 
         private static T[,] ResizeArray<T>(T[,] original, int x, int y)
         {
