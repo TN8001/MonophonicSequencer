@@ -82,7 +82,7 @@
         </MenuItem>
         <MenuItem Command="ApplicationCommands.Paste" Header="貼り付け(_P)">
           <MenuItem.Icon>
-            <Image Source="Resources/Paste_16x.png" />
+            <Image Source="Resources/Images/Paste_16x.png" />
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem Command="ApplicationCommands.Delete" Header="削除(_L)" />
@@ -171,7 +171,7 @@
           <Image Source="Resources/Images/Copy_16x.png" />
         </Button>
         <Button Command="ApplicationCommands.Paste">
-          <Image Source="Resources/Paste_16x.png" />
+          <Image Source="Resources/Images/Paste_16x.png" />
         </Button>
         <Separator />
         <Button Command="NavigationCommands.IncreaseZoom">

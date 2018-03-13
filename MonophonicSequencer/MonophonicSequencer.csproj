@@ -119,7 +119,7 @@
     <Resource Include="Resources\Images\Cut_16x.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Paste_16x.png" />
+    <Resource Include="Resources\Images\Paste_16x.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Images\Pause_16x.png" />
