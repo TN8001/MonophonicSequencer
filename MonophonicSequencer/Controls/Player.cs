@@ -91,7 +91,6 @@ namespace MonophonicSequencer.Controls
         private void Sequence_LoadCompleted(object sender, AsyncCompletedEventArgs e)
         {
             Debug.WriteLine("Sequence_LoadCompleted");
-            //sequencer.Start();
         }
         private void Sequence_LoadProgressChanged(object sender, ProgressChangedEventArgs e)
         {
