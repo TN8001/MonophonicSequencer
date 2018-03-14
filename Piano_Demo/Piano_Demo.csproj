@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E79394DA-0F88-4F8E-939E-2FAC616605B8}</ProjectGuid>
+    <ProjectGuid>{C9DE1D38-CE0E-417C-B72C-CCC917BB634F}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>MonophonicSequencer</RootNamespace>
-    <AssemblyName>MonophonicSequencer</AssemblyName>
+    <RootNamespace>Piano_Demo</RootNamespace>
+    <AssemblyName>Piano_Demo</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -24,31 +24,19 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>none</DebugType>
+    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NumericUpDownLib, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dirkster.NumericUpDownLib.1.0.2\lib\net4\NumericUpDownLib.dll</HintPath>
-    </Reference>
-    <Reference Include="PresentationFramework.Aero2" />
-    <Reference Include="Sanford.Multimedia.Midi, Version=6.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sanford.Multimedia.Midi.6.6.0\lib\net20\Sanford.Multimedia.Midi.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -67,16 +55,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Controls\ArrayExtemtions.cs" />
-    <Compile Include="Controls\MidiOut.cs" />
-    <Compile Include="Controls\PianoRollGrid.cs" />
-    <Compile Include="Controls\Player.cs" />
-    <Compile Include="Controls\TrackExtensions.cs" />
-    <Compile Include="IntPoint.cs" />
-    <Compile Include="Resources\Pens.cs" />
-    <Compile Include="Controls\PianoRollControl.xaml.cs">
-      <DependentUpon>PianoRollControl.xaml</DependentUpon>
-    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -89,65 +67,20 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Controls\PianoRollControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MonophonicSequencer.Controls\MonophonicSequencer.Controls.csproj">
+      <Project>{e7e280fa-40da-4b35-a362-58b31b65c6c4}</Project>
+      <Name>MonophonicSequencer.Controls</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\Save_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\SaveAs_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\NewFile_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\Undo_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\Redo_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\Copy_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\Cut_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\Paste_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\Pause_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\Run_blue_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\Stop_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\Settings_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\StatusHelp_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\OpenFolder_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\ZoomOut_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\ZoomIn_16x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
