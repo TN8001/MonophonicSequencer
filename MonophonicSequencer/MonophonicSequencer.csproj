@@ -67,16 +67,24 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AutoGridTest.xaml.cs">
+      <DependentUpon>AutoGridTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ArrayExtemtions.cs" />
+    <Compile Include="Controls\AutoGrid.cs" />
     <Compile Include="Controls\MidiOut.cs" />
+    <Compile Include="Controls\OverflowElementsDeletedEventArgs.cs" />
     <Compile Include="Controls\PianoRollGrid.cs" />
     <Compile Include="Controls\Player.cs" />
     <Compile Include="Controls\TrackExtensions.cs" />
-    <Compile Include="IntPoint.cs" />
     <Compile Include="Resources\Pens.cs" />
     <Compile Include="Controls\PianoRollControl.xaml.cs">
       <DependentUpon>PianoRollControl.xaml</DependentUpon>
     </Compile>
+    <Page Include="AutoGridTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

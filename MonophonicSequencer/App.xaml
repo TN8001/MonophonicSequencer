@@ -1,12 +1,26 @@
-﻿<Application
+﻿<!--  全体で共用するリソース定義  -->
+
+<!--<Application
+  x:Class="MonophonicSequencer.App"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
+  StartupUri="AutoGridTest.xaml">-->
+  <Application
   x:Class="MonophonicSequencer.App"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
   xmlns:local="clr-namespace:MonophonicSequencer"
-  StartupUri="MainWindow.xaml">
+    StartupUri="MainWindow.xaml">
+
   <Application.Resources>
 
+    <!--
+      無駄に長いがなくても特に問題はない
+      ツールバー右にある はみ出したボタンを表示するドロップボタンの
+      色を変更できるようにしただけ
+    -->
     <!--  OverflowButton Background bugfix  -->
     <ControlTemplate x:Key="ToolBarControlTemplate1" TargetType="{x:Type ToolBar}">
       <Grid

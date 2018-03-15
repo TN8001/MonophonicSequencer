@@ -1,4 +1,5 @@
-﻿<UserControl
+﻿<!--  ピアノロール機能を提供するユーザーコントロール  -->
+<UserControl
   x:Class="MonophonicSequencer.Controls.PianoRollControl"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -9,25 +10,31 @@
   d:DesignHeight="450"
   d:DesignWidth="800"
   mc:Ignorable="d">
-  <!--<UserControl.Resources>
-    <controls:MidiOut x:Key="out"></controls:MidiOut>
-  </UserControl.Resources>-->
-
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="Auto" />
       <ColumnDefinition />
     </Grid.ColumnDefinitions>
+    <!--  鍵盤予定地  -->
     <Border Background="Gray">
       <!--<Image Source="IMG_1771.PNG" />-->
     </Border>
 
+    <!--  スクロールは標準の機能に任せる  -->
     <ScrollViewer
       x:Name="scrollViewer"
       Grid.Column="1"
       HorizontalScrollBarVisibility="Visible"
       VerticalScrollBarVisibility="Hidden">
-      <controls:PianoRollGrid x:Name="piano" Width="3200" />
+      <!--
+        Grid（縦横に区切るコントロール）を継承し音符1個ずつ細かく分けている
+        現状だと256（16小節*16分音符）*37（3オクターブ+小節ヘッダ）= 9472個に区切っている
+        （9472個のコントロールを作っているわけではない）
+        小節ヘッダの数字はそれぞれTextBlockコントロール
+        赤い線はBorderコントロール
+        赤い線の移動時に位置ずれ矯正用に見えないBorderコントロール1個も使用
+      -->
+      <controls:PianoRollGrid x:Name="pianoRollGrid" Width="3200" />
     </ScrollViewer>
   </Grid>
 </UserControl>

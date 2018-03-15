@@ -1,6 +1,7 @@
 ﻿// (c) Gushwell 2010
 // http://gushwell.ldblog.jp/archives/52103538.html
 
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -11,12 +11,6 @@ using System.Windows.Media;
 
 namespace MonophonicSequencer.Controls
 {
-    // 現時点の仕様
-    // 4/4拍子 固定
-    // 16分音符 固定
-    // 鍵盤数36 固定（3オクターブ C3:48～B5:83）
-    // 単音 音色0 エフェクト無し
-    // Output0 固定
     public class PianoRollGrid : Grid
     {
         private const int KeyCount = 36;
@@ -103,10 +97,9 @@ namespace MonophonicSequencer.Controls
         private byte note => (byte)(83 - position.Y);
         private Border[,] noteArray = new Border[0, 0];
         private TextBlock[] measureText = new TextBlock[0];
-        private IntPoint position;
+        private (int X, int Y) position;
         private Border line;
         private Border measurer;
-
         static PianoRollGrid()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(PianoRollGrid), new FrameworkPropertyMetadata(typeof(PianoRollGrid)));
@@ -214,7 +207,7 @@ namespace MonophonicSequencer.Controls
             => dc.DrawLine(pen, new Point(x1, x2), new Point(y1, y2));
         #endregion
 
-        private double GetmeasurerX(int col)
+        private double GetMeasurerX(int col)
         {
             SetColumn(measurer, col);
             UpdateLayout();
@@ -229,7 +222,7 @@ namespace MonophonicSequencer.Controls
 
             var p = GetCellNumber();
             if(p.Y == -1) // 小節ヘッダー
-                Offset = GetmeasurerX(p.X);
+                Offset = GetMeasurerX(p.X);
             else
                 PlayNote(p);
         }
@@ -239,7 +232,7 @@ namespace MonophonicSequencer.Controls
 
             if(e.LeftButton != MouseButtonState.Pressed) return;
             var p = GetCellNumber();
-            if(p == position) return;
+            if(p.X == position.X && p.Y == position.Y) return;
 
             PlayNote(p);
         }
@@ -250,9 +243,9 @@ namespace MonophonicSequencer.Controls
             RemoveNote(GetCellNumber());
         }
 
-        private IntPoint GetCellNumber()
+        private (int X, int Y) GetCellNumber()
         {
-            var p = new IntPoint(0, -1);
+            var p = (X: 0, Y: -1);
             var height = 0.0;
             var width = 0.0;
             var point = Mouse.GetPosition(this);
@@ -274,7 +267,7 @@ namespace MonophonicSequencer.Controls
             Debug.WriteLine(p);
             return p;
         }
-        private void PlayNote(IntPoint p)
+        private void PlayNote((int X, int Y) p)
         {
             if(p.Y == -1) return; // 小節ヘッダー
 
@@ -288,7 +281,7 @@ namespace MonophonicSequencer.Controls
             NoteOn();
             Debug.WriteLine(note);
         }
-        private void AddNote(IntPoint point) => AddNote(point.X, point.Y);
+        private void AddNote((int X, int Y) point) => AddNote(point.X, point.Y);
         private void AddNote(int column, int row)
         {
             var border = new Border { Background = Brushes.Blue };
@@ -299,7 +292,7 @@ namespace MonophonicSequencer.Controls
             noteArray[column, row] = border;
             IsDirty = true;
         }
-        private void RemoveNote(IntPoint point) => RemoveNote(point.X, point.Y);
+        private void RemoveNote((int X, int Y) point) => RemoveNote(point.X, point.Y);
         private void RemoveNote(int column, int row)
         {
             var note = noteArray[column, row];

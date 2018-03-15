@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿//通常はVisuralStudioのメニュー[プロジェクト]→[○○のプロパティ]から編集する
+
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 
