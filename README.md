@@ -1,21 +1,24 @@
-# MonophonicSequencer
+ï»¿# MonophonicSequencer
 [![Build status](https://ci.appveyor.com/api/projects/status/6ax85u12lnp28e96/branch/master?svg=true)](https://ci.appveyor.com/project/TN8001/monophonicsequencer/branch/master)
-## ŠT—v
-’P‰¹E16•ª‰¹•„‚Ì‚İ‚ÌMIDIƒeƒXƒgƒAƒvƒŠB
-–¢À‘•‚Ì‹@”\‘½”B
-## ƒ_ƒEƒ“ƒ[ƒh
-[ÅVReleaseƒy[ƒW](https://github.com/TN8001/MonophonicSequencer/releases/latest)   
-Àsƒtƒ@ƒCƒ‹ MonophonicSequencer.zipiWindows10‚Å‚Ì‚İ“®ìŠm”Fj  
-ƒ\[ƒXƒR[ƒh Source code (zip)iVisual Studio 2017j
+## æ¦‚è¦
+å˜éŸ³ãƒ»16åˆ†éŸ³ç¬¦ã®ã¿ã®MIDIãƒ†ã‚¹ãƒˆã‚¢ãƒ—ãƒªã€‚
+æœªå®Ÿè£…ã®æ©Ÿèƒ½å¤šæ•°ã€‚
+## ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰
+[æœ€æ–°Releaseãƒšãƒ¼ã‚¸](https://github.com/TN8001/MonophonicSequencer/releases/latest)   
+å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ« MonophonicSequencer.zipï¼ˆWindows10ã§ã®ã¿å‹•ä½œç¢ºèªï¼‰  
+ã‚½ãƒ¼ã‚¹ã‚³ãƒ¼ãƒ‰ Source code (zip)ï¼ˆVisual Studio 2017ï¼‰
 
-## ƒ‰ƒCƒZƒ“ƒX
-[MIT](https://github.com/TN8001/MonophonicSequencer/blob/master/LICENSE)
-## Ó«
-MIDI‚Ì§Œä‚ÉA‰º‹L‚ğ—˜—p‚³‚¹‚Ä’¸‚¢‚Ä‚¨‚è‚Ü‚·B  
+## ãƒ©ã‚¤ã‚»ãƒ³ã‚¹
+CC0 1.0 Universal
+
+[![CC0](http://i.creativecommons.org/p/zero/1.0/88x31.png)](LICENSE)
+
+## è¬è¾
+MIDIã®åˆ¶å¾¡ã«ã€ä¸‹è¨˜ã‚’åˆ©ç”¨ã•ã›ã¦é ‚ã„ã¦ãŠã‚Šã¾ã™ã€‚  
 [Sanford.Multimedia.Midi](https://github.com/tebjan/Sanford.Multimedia.Midi) Copyright (c) 2007 Leslie Sanford,Tebjan Halm,Andreas Grimme,Andres Fernandez de Prado
 
-ƒAƒbƒvƒ_ƒEƒ“ƒRƒ“ƒgƒ[ƒ‹‚ÉA‰º‹L‚ğ—˜—p‚³‚¹‚Ä’¸‚¢‚Ä‚¨‚è‚Ü‚·B  
+ã‚¢ãƒƒãƒ—ãƒ€ã‚¦ãƒ³ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã«ã€ä¸‹è¨˜ã‚’åˆ©ç”¨ã•ã›ã¦é ‚ã„ã¦ãŠã‚Šã¾ã™ã€‚  
 [NumericUpDownLib](https://github.com/Dirkster99/NumericUpDownLib/) Copyright (c) 2014-2017 Dirk Bahle
 
-ƒAƒCƒRƒ“‰æ‘œ‚ÉA‰º‹L‚ğ—˜—p‚³‚¹‚Ä’¸‚¢‚Ä‚¨‚è‚Ü‚·B  
+ã‚¢ã‚¤ã‚³ãƒ³ç”»åƒã«ã€ä¸‹è¨˜ã‚’åˆ©ç”¨ã•ã›ã¦é ‚ã„ã¦ãŠã‚Šã¾ã™ã€‚  
 [Visual Studio 2017 Image Library](https://www.microsoft.com/en-us/download/details.aspx?id=35825) Copyright (c) 2017 Microsoft
