@@ -158,32 +158,5 @@ namespace MonophonicSequencer.Controls
             OnRowCountChanged(RowDefinitions.Count, RowCount);
             OnColumnCountChanged(ColumnDefinitions.Count, ColumnCount);
         }
-
-
-        private (int X, int Y) GetCellNumber()
-        {
-            var p = (X: 0, Y: -1);
-            var height = 0.0;
-            var width = 0.0;
-            var point = Mouse.GetPosition(this);
-
-            foreach(var columnDefinition in ColumnDefinitions)
-            {
-                width += columnDefinition.ActualWidth;
-                if(width >= point.X) break;
-
-                p.X++;
-            }
-            foreach(var rowDefinition in RowDefinitions)
-            {
-                height += rowDefinition.ActualHeight;
-                if(height >= point.Y) break;
-
-                p.Y++;
-            }
-            Debug.WriteLine(p);
-            return p;
-        }
     }
-
 }

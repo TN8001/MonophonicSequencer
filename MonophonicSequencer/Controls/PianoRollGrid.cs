@@ -11,10 +11,10 @@ using System.Windows.Media;
 
 namespace MonophonicSequencer.Controls
 {
-    public class PianoRollGrid : Grid
+    public class PianoRollGrid : AutoGrid
     {
         private const int KeyCount = 36;
-        private static readonly HashSet<int> blackKeys = new HashSet<int> { 1, 3, 5, 8, 10 };
+        private const int Division = 16;
 
         #region DependencyProperty MeasureCount 小節数
         public int MeasureCount { get => (int)GetValue(MeasureCountProperty); set => SetValue(MeasureCountProperty, value); }
@@ -27,43 +27,30 @@ namespace MonophonicSequencer.Controls
         }
         private void OnMeasureCountChanged()
         {
-            var c = MeasureCount * 16;
+            var c = MeasureCount * Division;
             if(ColumnDefinitions.Count == c) return;
 
-            if(ColumnDefinitions.Count > c) // 譜面縮小
-            {
-                // はみ出した要素を削除
-                for(var i = c; i < noteArray.GetLength(0); i++)
-                {
-                    if(measureText[i] != null)
-                        Children.Remove(measureText[i]);
-                    for(var j = 0; j < noteArray.GetLength(1); j++)
-                        Children.Remove(noteArray[i, j]);
-                }
+            ColumnCount = c + 1;
 
-                while(ColumnDefinitions.Count != c)
-                    ColumnDefinitions.RemoveAt(ColumnDefinitions.Count);
-                IsDirty = true;
-            }
-            else // 譜面拡大
-            {
-                while(ColumnDefinitions.Count != c)
-                    ColumnDefinitions.Add(new ColumnDefinition());
-            }
             noteArray = ResizeArray(noteArray, c, RowDefinitions.Count);
             Array.Resize(ref measureText, c);
             AddMeasureText();
 
-            SetColumnSpan(line, MeasureCount * 16);
+            SetColumnSpan(line, MeasureCount * Division);
         }
 
         private void AddMeasureText()
         {
-            for(var i = 0; i < measureText.GetLength(0); i += 16)
+            for(var i = 0; i < measureText.GetLength(0); i += Division)
             {
                 if(measureText[i] != null) continue;
 
-                var b = new TextBlock { Text = $"{i / 16 + 1}", FontSize = 20 };
+                var b = new TextBlock
+                {
+                    Text = "" + (i / Division + 1),
+                    FontSize = 20,
+                    Margin = new Thickness(5, 0, 0, 0),
+                };
                 SetColumn(b, i);
                 SetColumnSpan(b, 4);
                 SetRow(b, 0);
@@ -100,15 +87,19 @@ namespace MonophonicSequencer.Controls
         private (int X, int Y) position;
         private Border line;
         private Border measurer;
+        private GridRenderer renderer;
+
         static PianoRollGrid()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(PianoRollGrid), new FrameworkPropertyMetadata(typeof(PianoRollGrid)));
         }
         public PianoRollGrid()
         {
+            renderer = new GridRenderer(this);
+
             RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            while(RowDefinitions.Count != KeyCount + 1)
-                RowDefinitions.Add(new RowDefinition());
+
+            RowCount = KeyCount + 1;
 
             AddLine();
             measurer = new Border { Visibility = Visibility.Hidden, };
@@ -140,72 +131,11 @@ namespace MonophonicSequencer.Controls
             Children.Add(line);
         }
 
-        #region OnRender
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
-            RenderGrid(dc);
+            renderer.OnRender(dc);
         }
-        private void RenderGrid(DrawingContext dc)
-        {
-            RenderBlackKeys(dc);
-            RenderLightGrayLine(dc);
-            RenderGrayLine(dc);
-            RenderBlackLine(dc);
-
-            var rect = new Rect(0, 0, ActualWidth, ActualHeight);
-            dc.DrawRectangle(Brushes.Transparent, Pens.Black, rect); // 全体囲む四角 黒
-        }
-        private void RenderBlackKeys(DrawingContext dc) // 黒鍵 極薄グレー
-        {
-            var index = 0;
-            foreach(var row in RowDefinitions)
-            {
-                if(!blackKeys.Contains((index++ % 12) - 1)) continue;
-
-                var rect = new Rect(0, row.Offset, ActualWidth, row.ActualHeight);
-                dc.DrawRectangle(Brushes.WhiteSmoke, Pens.Transparent, rect);
-            }
-        }
-        private void RenderLightGrayLine(DrawingContext dc) // 基本区切り線 薄グレー
-        {
-            foreach(var row in RowDefinitions)
-                DrawLine(dc, Pens.LightGray, 0, row.Offset, ActualWidth, row.Offset);
-
-            foreach(var column in ColumnDefinitions)
-                DrawLine(dc, Pens.LightGray, column.Offset, 0, column.Offset, ActualHeight);
-        }
-        private void RenderGrayLine(DrawingContext dc) // 4分音符区切り線 グレー
-        {
-            var index = 0;
-            foreach(var column in ColumnDefinitions)
-            {
-                if(index++ % 4 != 0) continue;
-
-                DrawLine(dc, Pens.Gray, column.Offset, 0, column.Offset, ActualHeight);
-            }
-        }
-        private void RenderBlackLine(DrawingContext dc) // 小節・オクターブ区切り線 黒
-        {
-            var index = 0;
-            foreach(var column in ColumnDefinitions)
-            {
-                if(index++ % 16 != 0) continue;
-
-                DrawLine(dc, Pens.Black, column.Offset, 0, column.Offset, ActualHeight);
-            }
-
-            index = 0;
-            foreach(var row in RowDefinitions)
-            {
-                if(index++ % 12 != 1) continue;
-
-                DrawLine(dc, Pens.Black, 0, row.Offset, ActualWidth, row.Offset);
-            }
-        }
-        private void DrawLine(DrawingContext dc, Pen pen, double x1, double x2, double y1, double y2)
-            => dc.DrawLine(pen, new Point(x1, x2), new Point(y1, y2));
-        #endregion
 
         private double GetMeasurerX(int col)
         {

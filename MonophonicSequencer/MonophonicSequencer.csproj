@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>MonophonicSequencer</RootNamespace>
     <AssemblyName>MonophonicSequencer</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -72,9 +72,11 @@
     </Compile>
     <Compile Include="Controls\ArrayExtemtions.cs" />
     <Compile Include="Controls\AutoGrid.cs" />
+    <Compile Include="Controls\GridRenderer.cs" />
     <Compile Include="Controls\MidiOut.cs" />
     <Compile Include="Controls\OverflowElementsDeletedEventArgs.cs" />
     <Compile Include="Controls\PianoRollGrid.cs" />
+    <Compile Include="Controls\PianoRollGrid2.cs" />
     <Compile Include="Controls\Player.cs" />
     <Compile Include="Controls\TrackExtensions.cs" />
     <Compile Include="Resources\Pens.cs" />
